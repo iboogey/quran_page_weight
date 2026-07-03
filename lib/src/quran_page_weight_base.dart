@@ -133,6 +133,13 @@ class QuranPageWeight {
     return _ayahFromIndex(lo);
   }
 
+  /// Page weight of the whole [sura].
+  double suraPages(int sura) =>
+      pages(start: Ayah(sura, 1), end: Ayah(sura, ayahCount(sura)));
+
+  /// The 1-based mushaf page on which [sura] begins.
+  int suraStartPage(int sura) => pageOf(Ayah(sura, 1));
+
   /// Converts a 0-based global ayah index back to an [Ayah].
   Ayah _ayahFromIndex(int i) {
     var lo = 0, hi = 113;

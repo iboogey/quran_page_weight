@@ -106,4 +106,44 @@ class QuranPageWeight {
     final i = _index(ayah);
     return _weightBetween(i, i) / _pageTotals[_pageOfIndex(i)];
   }
+
+  /// The ayah at which a portion of [pages] pages, starting at [start]
+  /// (inclusive), ends: the earliest ayah `end` such that
+  /// `pages(start: start, end: end) >= pages`.
+  ///
+  /// Clamped to the last ayah of the Quran (114:6) if the portion runs
+  /// past the end.
+  Ayah endOfPortion({required Ayah start, required double pages}) {
+    if (pages <= 0) {
+      throw ArgumentError.value(pages, 'pages', 'must be greater than zero');
+    }
+    final si = _index(start, 'start');
+    final last = data.ayahWeights.length - 1;
+    if (_pagesByIndex(si, last) <= pages) return const Ayah(114, 6);
+    // pages(si..ei) grows monotonically in ei, so binary search works.
+    var lo = si, hi = last;
+    while (lo < hi) {
+      final mid = (lo + hi) >> 1;
+      if (_pagesByIndex(si, mid) >= pages) {
+        hi = mid;
+      } else {
+        lo = mid + 1;
+      }
+    }
+    return _ayahFromIndex(lo);
+  }
+
+  /// Converts a 0-based global ayah index back to an [Ayah].
+  Ayah _ayahFromIndex(int i) {
+    var lo = 0, hi = 113;
+    while (lo < hi) {
+      final mid = (lo + hi + 1) >> 1;
+      if (_suraOffsets[mid] <= i) {
+        lo = mid;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    return Ayah(lo + 1, i - _suraOffsets[lo] + 1);
+  }
 }

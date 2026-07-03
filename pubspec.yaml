@@ -4,6 +4,8 @@ description: >-
   range. Range → pages, reverse lookup, and sura page info. Offline, zero
   dependencies, pure Dart.
 version: 0.1.0
+repository: https://github.com/iboogey/quran_page_weight
+issue_tracker: https://github.com/iboogey/quran_page_weight/issues
 environment:
   sdk: ^3.0.0
 dev_dependencies:

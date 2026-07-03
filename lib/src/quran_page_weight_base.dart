@@ -77,4 +77,33 @@ class QuranPageWeight {
 
   /// Sum of effective weights of global indices [i]..[j], inclusive.
   double _weightBetween(int i, int j) => _cumWeights[j + 1] - _cumWeights[i];
+
+  /// Page weight of the inclusive range [start]..[end].
+  ///
+  /// Full pages inside the range count exactly 1.0; the partial first and
+  /// last pages count as (weight read on page / total weight of page).
+  double pages({required Ayah start, required Ayah end}) {
+    final si = _index(start, 'start');
+    final ei = _index(end, 'end');
+    if (si > ei) {
+      throw ArgumentError('start $start comes after end $end in mushaf order');
+    }
+    return _pagesByIndex(si, ei);
+  }
+
+  double _pagesByIndex(int si, int ei) {
+    final ps = _pageOfIndex(si);
+    final pe = _pageOfIndex(ei);
+    if (ps == pe) return _weightBetween(si, ei) / _pageTotals[ps];
+    final startFrac = _weightBetween(si, _pageEnd(ps)) / _pageTotals[ps];
+    final endFrac =
+        _weightBetween(data.pageFirstAyahIndex[pe], ei) / _pageTotals[pe];
+    return startFrac + (pe - ps - 1) + endFrac;
+  }
+
+  /// Weight of a single [ayah] as a fraction of its page.
+  double ayahWeight(Ayah ayah) {
+    final i = _index(ayah);
+    return _weightBetween(i, i) / _pageTotals[_pageOfIndex(i)];
+  }
 }

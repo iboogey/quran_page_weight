@@ -2,3 +2,4 @@
 library;
 
 export 'src/ayah.dart';
+export 'src/quran_page_weight_base.dart';
